@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">LexLock</string>
+    
+    <style name="Theme.LexLock" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="Theme.LexLock.LockScreen" parent="Theme.LexLock">
+        <!-- These are handled in AndroidManifest.xml for the Activity -->
+    </style>
+</resources>

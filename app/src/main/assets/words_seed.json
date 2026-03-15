@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "word": "Ephemeral",
+    "meaning": "Lasting for a very short time.",
+    "example": "The ephemeral beauty of a sunset is what makes it so special.",
+    "pronunciation": "/əˈfem(ə)rəl/",
+    "category": "General English",
+    "difficulty": "Medium"
+  },
+  {
+    "id": 2,
+    "word": "Ubiquitous",
+    "meaning": "Present, appearing, or found everywhere.",
+    "example": "Sugar is ubiquitous in the modern diet.",
+    "pronunciation": "/juːˈbɪkwɪtəs/",
+    "category": "General English",
+    "difficulty": "Hard"
+  },
+  {
+    "id": 3,
+    "word": "Leverage",
+    "meaning": "Use something to maximum advantage.",
+    "example": "We can leverage our existing resources to expand the business.",
+    "pronunciation": "/ˈliːvərɪdʒ/",
+    "category": "Business English",
+    "difficulty": "Medium"
+  },
+  {
+    "id": 4,
+    "word": "Prerequisite",
+    "meaning": "A thing that is required as a prior condition for something else to happen.",
+    "example": "A degree is a prerequisite for this job.",
+    "pronunciation": "/ˌpriːˈrekwɪzɪt/",
+    "category": "Academic Words",
+    "difficulty": "Hard"
+  },
+  {
+    "id": 5,
+    "word": "Break the ice",
+    "meaning": "Say or do something to relieve tension or get a conversation started.",
+    "example": "A joke can help break the ice at a formal event.",
+    "pronunciation": "N/A",
+    "category": "Idioms / Phrases",
+    "difficulty": "Easy"
+  }
+]

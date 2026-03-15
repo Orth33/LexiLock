@@ -1,0 +1,55 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Android / IntelliJ
+/.idea/
+*.iml
+*.hprof
+
+# Kotlin/Java
+*.class
+*.jar
+*.war
+*.ear
+
+# User-specific files
+local.properties
+
+# Android Studio
+/.cxx/
+.externalNativeBuild/
+
+# Kotlin daemon
+.kotlin/
+
+# Generated files
+app/build/
+
+# NDK
+obj/
+
+# Log files
+*.log
+
+# Mac/Linux
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# JetBrains
+out/
+
+# Gradle wrapper
+gradle-wrapper.jar
+
+# Temporary files
+*.tmp
+*~
+
+# Others
+captures/
+crashlytics.properties
+*/build/
