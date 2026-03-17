@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,21 +18,30 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.lexlock.domain.repository.WordRepository
 import com.lexlock.services.DailyUpdateWorker
 import com.lexlock.services.LockScreenService
 import com.lexlock.ui.savedwords.SavedWordsScreen
 import com.lexlock.ui.settings.SettingsScreen
 import com.lexlock.ui.theme.LexLockTheme
+import com.lexlock.utils.AssetLoader
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var repository: WordRepository
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -41,8 +51,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("MainActivity", "onCreate")
         
         requestPermissions()
+        seedDatabaseIfNeeded()
 
         // Start services
         val serviceIntent = Intent(this, LockScreenService::class.java)
@@ -57,6 +69,24 @@ class MainActivity : ComponentActivity() {
         setContent {
             LexLockTheme {
                 MainScreen()
+            }
+        }
+    }
+
+    private fun seedDatabaseIfNeeded() {
+        lifecycleScope.launch {
+            try {
+                val allWords = repository.getAllWords().first()
+                if (allWords.isEmpty()) {
+                    Log.d("MainActivity", "Seeding database from JSON...")
+                    val words = AssetLoader.loadWordsFromJson(applicationContext, "words_seed.json")
+                    repository.insertWords(words)
+                    Log.d("MainActivity", "Seeding complete: ${words.size} words added.")
+                } else {
+                    Log.d("MainActivity", "Database already contains ${allWords.size} words.")
+                }
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Failed to seed database", e)
             }
         }
     }

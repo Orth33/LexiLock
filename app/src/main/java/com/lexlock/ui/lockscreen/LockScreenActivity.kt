@@ -4,6 +4,7 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -34,14 +35,16 @@ class LockScreenActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("LockScreenActivity", "onCreate called")
 
-        // Set flags to show over lock screen
+        // Configure activity to show over lock screen
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)
             setTurnScreenOn(true)
             val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
             keyguardManager.requestDismissKeyguard(this, null)
         } else {
+            @Suppress("DEPRECATION")
             window.addFlags(
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
@@ -49,11 +52,18 @@ class LockScreenActivity : ComponentActivity() {
             )
         }
 
+        // Additional flags to ensure it covers the screen fully
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window.addFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON)
+
         setContent {
             LexLockTheme {
                 LockScreenContent(
                     viewModel = viewModel,
-                    onUnlock = { finish() }
+                    onUnlock = { 
+                        Log.d("LockScreenActivity", "Unlocking...")
+                        finish() 
+                    }
                 )
             }
         }
@@ -66,6 +76,7 @@ fun LockScreenContent(
     onUnlock: () -> Unit
 ) {
     val wordState by viewModel.wordOfTheDay.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     var offsetY by remember { mutableStateOf(0f) }
 
     Box(
@@ -80,6 +91,7 @@ fun LockScreenContent(
                 orientation = Orientation.Vertical,
                 state = rememberDraggableState { delta ->
                     offsetY += delta
+                    // Swipe up to unlock
                     if (offsetY < -300f) {
                         onUnlock()
                     }
@@ -90,42 +102,62 @@ fun LockScreenContent(
             )
             .offset { IntOffset(0, offsetY.roundToInt()) }
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            wordState?.let { word ->
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = Color.White
+            )
+        } else if (wordState != null) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
                 Text(
-                    text = word.word,
+                    text = wordState!!.word,
                     style = MaterialTheme.typography.displayLarge,
                     color = Color.White,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = word.pronunciation,
+                    text = wordState!!.pronunciation,
                     style = MaterialTheme.typography.headlineMedium,
                     color = Color.LightGray,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
-                    text = word.meaning,
+                    text = wordState!!.meaning,
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.White,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "\"${word.example}\"",
+                    text = "\"${wordState!!.example}\"",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.LightGray,
                     textAlign = TextAlign.Center
                 )
-            } ?: CircularProgressIndicator(color = Color.White)
+            }
+        } else {
+            // Fallback UI if no word is found after attempts
+            Column(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Oops! No word found.",
+                    color = Color.White,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Button(onClick = { viewModel.fetchWord() }) {
+                    Text("Retry")
+                }
+            }
         }
 
         Column(

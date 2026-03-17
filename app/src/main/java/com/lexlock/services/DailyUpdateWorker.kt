@@ -13,11 +13,11 @@ import java.util.concurrent.TimeUnit
 
 @HiltWorker
 class DailyUpdateWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
+    @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     private val repository: WordRepository,
     private val getWordOfTheDayUseCase: GetWordOfTheDayUseCase
-) : CoroutineWorker(appContext, workerParams) {
+) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
         return try {

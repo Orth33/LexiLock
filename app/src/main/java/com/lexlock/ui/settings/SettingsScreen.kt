@@ -39,9 +39,9 @@ fun SettingsScreen(
                 )
             }
 
-//            item {
-//                HorizontalDivider()
-//            }
+            item {
+                HorizontalDivider()
+            }
 
             item {
                 NotificationSection(
@@ -50,9 +50,9 @@ fun SettingsScreen(
                 )
             }
 
-//            item {
-//                HorizontalDivider()
-//            }
+            item {
+                HorizontalDivider()
+            }
 
             item {
                 ThemeSection(
